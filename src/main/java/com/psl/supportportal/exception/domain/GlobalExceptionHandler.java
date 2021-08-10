@@ -65,27 +65,27 @@ public class GlobalExceptionHandler implements ErrorController{
 	
 	@ExceptionHandler(TokenExpiredException.class)
 	public ResponseEntity<HttpResponse> tokenExpiredException(TokenExpiredException exception){
-		return createHttpResponse(HttpStatus.UNAUTHORIZED, exception.getMessage().toUpperCase());
+		return createHttpResponse(HttpStatus.UNAUTHORIZED, exception.getMessage());
 	}
 	
 	@ExceptionHandler(EmailAlreadyExistException.class)
 	public ResponseEntity<HttpResponse> emailAlreadyExistException(EmailAlreadyExistException exception){
-		return createHttpResponse(HttpStatus.BAD_REQUEST, exception.getMessage().toUpperCase());
+		return createHttpResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
 	}
 	
 	@ExceptionHandler(UsernameExistException.class)
 	public ResponseEntity<HttpResponse> usernameExistException(UsernameExistException exception){
-		return createHttpResponse(HttpStatus.BAD_REQUEST, exception.getMessage().toUpperCase());
+		return createHttpResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
 	}
 	
 	@ExceptionHandler(EmailNotFoundException.class)
 	public ResponseEntity<HttpResponse> emailNotFoundException(EmailNotFoundException exception){
-		return createHttpResponse(HttpStatus.BAD_REQUEST, exception.getMessage().toUpperCase());
+		return createHttpResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
 	}
 	
 	@ExceptionHandler(UserNotFoundException.class)
 	public ResponseEntity<HttpResponse> userNotFoundException(UserNotFoundException exception){
-		return createHttpResponse(HttpStatus.BAD_REQUEST, exception.getMessage().toUpperCase());
+		return createHttpResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
 	}
 	
 	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -109,6 +109,12 @@ public class GlobalExceptionHandler implements ErrorController{
 	public ResponseEntity<HttpResponse> notFoundException(NoResultException exception){
 		LOGGER.error(exception.getMessage());
 		return createHttpResponse(HttpStatus.NOT_FOUND, exception.getMessage());
+	}
+	
+	@ExceptionHandler(NotAnImageFileException.class)
+	public ResponseEntity<HttpResponse> notAnImageException(NotAnImageFileException exception){
+		LOGGER.error(exception.getMessage());
+		return createHttpResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
 	}
 	
 	@ExceptionHandler(IOException.class)

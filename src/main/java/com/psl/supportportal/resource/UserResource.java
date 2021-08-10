@@ -36,6 +36,7 @@ import com.psl.supportportal.domain.UserPrincipal;
 import com.psl.supportportal.exception.domain.EmailAlreadyExistException;
 import com.psl.supportportal.exception.domain.EmailNotFoundException;
 import com.psl.supportportal.exception.domain.GlobalExceptionHandler;
+import com.psl.supportportal.exception.domain.NotAnImageFileException;
 import com.psl.supportportal.exception.domain.UserNotFoundException;
 import com.psl.supportportal.exception.domain.UsernameExistException;
 import com.psl.supportportal.service.UserService;
@@ -84,7 +85,7 @@ public class UserResource extends GlobalExceptionHandler{
 			@RequestParam("role") String role,
 			@RequestParam("isActive") String isActive,
 			@RequestParam("isNotLocked") String isNotLocked,
-			@RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws EmailAlreadyExistException, UsernameExistException, UserNotFoundException, IOException{
+			@RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws EmailAlreadyExistException, UsernameExistException, UserNotFoundException, IOException, NotAnImageFileException{
 		User newUser = userService.addNewUser(firstName, lastName, username, email, role,
 				Boolean.parseBoolean(isNotLocked), Boolean.parseBoolean(isActive), profileImage);
 		return new ResponseEntity<User>(newUser, HttpStatus.OK);
@@ -99,7 +100,7 @@ public class UserResource extends GlobalExceptionHandler{
 			@RequestParam("role") String role,
 			@RequestParam("isActive") String isActive,
 			@RequestParam("isNotLocked") String isNotLocked,
-			@RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws EmailAlreadyExistException, UsernameExistException, UserNotFoundException, IOException{
+			@RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws EmailAlreadyExistException, UsernameExistException, UserNotFoundException, IOException, NotAnImageFileException{
 		User updatedUser = userService.updateUser(currentUsername, firstName, lastName, username, email, role,
 				Boolean.parseBoolean(isNotLocked), Boolean.parseBoolean(isActive), profileImage);
 		return new ResponseEntity<>(updatedUser, HttpStatus.OK);
@@ -123,25 +124,25 @@ public class UserResource extends GlobalExceptionHandler{
 		return response(HttpStatus.OK, EMAIL_SENT+email);
 	}
 	
-	@DeleteMapping("/delete/{id}")
+	@DeleteMapping("/delete/{username}")
 	@PreAuthorize("hasAnyAuthority('user:delete')")
-	public ResponseEntity<HttpResponse> deleteUser(@PathVariable("id") Long id){
-		userService.deleteUser(id);
-		return response(HttpStatus.NO_CONTENT, USER_DELETED_SUCCESSFULLY);
+	public ResponseEntity<HttpResponse> deleteUser(@PathVariable("username") String username) throws IOException{
+		userService.deleteUser(username);
+		return response(HttpStatus.OK, USER_DELETED_SUCCESSFULLY);
 	}
 	
 	@PostMapping("/updateProfileImage")
-	public ResponseEntity<User> updateProfileImage(@RequestParam("username") String username, @RequestParam(value = "profileImage") MultipartFile profileImage) throws EmailAlreadyExistException, UsernameExistException, UserNotFoundException, IOException{
+	public ResponseEntity<User> updateProfileImage(@RequestParam("username") String username, @RequestParam(value = "profileImage") MultipartFile profileImage) throws EmailAlreadyExistException, UsernameExistException, UserNotFoundException, IOException, NotAnImageFileException{
 		User user = userService.updateProfileImage(username, profileImage);
 		return new ResponseEntity<>(user, HttpStatus.OK);
 	}
 	
 	@GetMapping(path = "/image/{username}/{fileName}", produces = MediaType.IMAGE_JPEG_VALUE)
 	public byte[] getProfileImage(@PathVariable("username") String username, @PathVariable("fileName") String fileName) throws IOException {
-		return Files.readAllBytes(Paths.get(USER_FOLDER + FORWARD_SLASH + fileName));
+		return Files.readAllBytes(Paths.get(USER_FOLDER + username +FORWARD_SLASH + fileName));
 	}
 	
-	@GetMapping(path = "/image/{profile}/{username}", produces = MediaType.IMAGE_JPEG_VALUE)
+	@GetMapping(path = "/image/profile/{username}", produces = MediaType.IMAGE_JPEG_VALUE)
 	public byte[] getTempProfileImage(@PathVariable("username") String username) throws IOException {
 		URL url = new URL(TEMP_PROFILE_IMAGE_BASE_URL+username);
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -157,7 +158,7 @@ public class UserResource extends GlobalExceptionHandler{
 	
 	private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
 		HttpResponse body = new HttpResponse(httpStatus.value(), httpStatus,
-				httpStatus.getReasonPhrase().toUpperCase(), message);
+				httpStatus.getReasonPhrase(), message);
 		return new ResponseEntity<HttpResponse>(body, httpStatus);
 	}
 
