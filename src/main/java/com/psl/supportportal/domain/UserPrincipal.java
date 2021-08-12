@@ -57,4 +57,8 @@ public class UserPrincipal implements UserDetails {
 		return this.user.isActive();
 	}
 
+	public User getUser() {
+		return user;
+	}
+
 }

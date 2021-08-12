@@ -45,7 +45,11 @@ import com.psl.supportportal.repository.UserRepository;
 @Transactional
 @Qualifier("UserDetailsService")
 public class UserServiceImpl implements UserService, UserDetailsService {
+
 	
+	public UserServiceImpl() {
+	}
+
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	@Autowired
 	private UserRepository userRepository;
@@ -56,10 +60,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	@Autowired
 	private LoginAttemptService loginAttemptService;
 	
+	
 //	@Autowired
 //	private EmailService emailService;
-
-
+	
+	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = userRepository.findUserByUsername(username);
@@ -113,6 +118,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		user.setAuthorities(Role.ROLE_USER.getAuthorities());
 		user.setProfileImageUrl(getTemporaryProfileImageUrl(userName));
 		userRepository.save(user);
+		userRepository.flush();
 		logger.info("New user password : "+ password);
 		//emailService.sendPasswordEmail(firstName, password, email);
 		return user;
@@ -197,7 +203,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		user.setRole(getRoleEnumName(role).name());
 		user.setAuthorities(getRoleEnumName(role).getAuthorities());
 		user.setProfileImageUrl(getTemporaryProfileImageUrl(username));
-		userRepository.save(user);
+		//userRepository.save(user);
 		saveProfileImage(user, profileImage);
 		logger.info("New user password : "+ password);
 		//emailService.sendPasswordEmail(firstName, password, email);
@@ -207,7 +213,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	private void saveProfileImage(User user, MultipartFile profileImage) throws IOException, NotAnImageFileException {
 		if(profileImage != null) {
 			if(!Arrays.asList(IMAGE_JPEG_VALUE, IMAGE_PNG_VALUE, IMAGE_GIF_VALUE).contains(profileImage.getContentType())) {
-				throw new NotAnImageFileException(profileImage.getOriginalFilename() + "is not an image file");
+				throw new NotAnImageFileException(profileImage.getOriginalFilename() + " is not an image file");
 			}
 			Path userFolder = Paths.get(USER_FOLDER + user.getUsername()).toAbsolutePath().normalize();
 			if(!Files.exists(userFolder)) {
@@ -219,6 +225,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 			user.setProfileImageUrl(setProfileImageUrl(user.getUsername()));
 			userRepository.save(user);
 			logger.info(FILE_SAVED_IN_FILE_SYSTEM + profileImage.getOriginalFilename());
+		}
+		else {
+			userRepository.save(user);
 		}
 		
 	}
@@ -244,7 +253,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		currentUser.setNotLocked(isNotLocked);
 		currentUser.setRole(getRoleEnumName(role).name());
 		currentUser.setAuthorities(getRoleEnumName(role).getAuthorities());
-		userRepository.save(currentUser);
+		//userRepository.save(currentUser);
 		saveProfileImage(currentUser, profileImage);
 		return currentUser;
 	}
