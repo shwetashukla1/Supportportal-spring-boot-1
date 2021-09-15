@@ -46,10 +46,6 @@ import com.psl.supportportal.repository.UserRepository;
 @Qualifier("UserDetailsService")
 public class UserServiceImpl implements UserService, UserDetailsService {
 
-	
-	public UserServiceImpl() {
-	}
-
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	@Autowired
 	private UserRepository userRepository;

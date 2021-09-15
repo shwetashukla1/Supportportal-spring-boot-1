@@ -27,7 +27,7 @@ import com.psl.supportportal.domain.HttpResponse;
 @RestControllerAdvice
 public class GlobalExceptionHandler implements ErrorController{
 
-	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private static final String ACCOUNT_LOCKED = "Your Account has been locked please contact Administration";
 	private static final String METHOD_IS_NOT_ALLOWED = "This request method is not allowed on this endpoint. Please send a '%s' request";
 	private static final String INTERNAL_SERVER_ERROR_MESSAGE = "An error occurred while processing the request";
@@ -39,7 +39,7 @@ public class GlobalExceptionHandler implements ErrorController{
 	
 	
 	private ResponseEntity<HttpResponse> createHttpResponse(HttpStatus httpStatus, String message){
-		return new ResponseEntity<>(new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(), message.toUpperCase()),
+		return new ResponseEntity<>(new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase(), message),
 				httpStatus);
 	}
 	
@@ -101,25 +101,25 @@ public class GlobalExceptionHandler implements ErrorController{
 	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<HttpResponse> internalServerErrorException(Exception exception){
-		LOGGER.error(exception.getMessage());
+		logger.error(exception.getMessage());
 		return createHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR_MESSAGE);
 	}
 	
 	@ExceptionHandler(NoResultException.class)
 	public ResponseEntity<HttpResponse> notFoundException(NoResultException exception){
-		LOGGER.error(exception.getMessage());
+		logger.error(exception.getMessage());
 		return createHttpResponse(HttpStatus.NOT_FOUND, exception.getMessage());
 	}
 	
 	@ExceptionHandler(NotAnImageFileException.class)
 	public ResponseEntity<HttpResponse> notAnImageException(NotAnImageFileException exception){
-		LOGGER.error(exception.getMessage());
+		logger.error(exception.getMessage());
 		return createHttpResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
 	}
 	
 	@ExceptionHandler(IOException.class)
 	public ResponseEntity<HttpResponse> iOException(IOException exception){
-		LOGGER.error(exception.getMessage());
+		logger.error(exception.getMessage());
 		return createHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR, ERROR_PROCESSING_FILE);
 	}
 	

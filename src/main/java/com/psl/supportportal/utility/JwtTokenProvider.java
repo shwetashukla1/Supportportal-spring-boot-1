@@ -35,7 +35,7 @@ public class JwtTokenProvider {
 	private String secret;
 	
 	public String generateJwtToken(UserPrincipal userPrincipal) {
-		String claims[] = this.getClaimsFromUser(userPrincipal);
+		String[] claims = this.getClaimsFromUser(userPrincipal);
 		return JWT.create()
 				.withIssuer(PERSISTENT_SYSTEMS_LIMITED)
 				.withAudience(PERSISTENT_SYSTEMS_LIMITED_ADMIN)
