@@ -118,7 +118,7 @@ public class UserResource extends GlobalExceptionHandler{
 	}
 	
 	@GetMapping("/resetPassword/{email}")
-	public ResponseEntity<HttpResponse> resetPassword(@PathVariable("email") String email) throws EmailNotFoundException{
+	public ResponseEntity<HttpResponse> resetPassword(@PathVariable("email") String email) throws EmailNotFoundException, MessagingException{
 		userService.resetPassword(email);
 		return response(HttpStatus.OK, EMAIL_SENT+email);
 	}
@@ -138,10 +138,10 @@ public class UserResource extends GlobalExceptionHandler{
 	
 	@GetMapping(path = "/image/{username}/{fileName}", produces = MediaType.IMAGE_JPEG_VALUE)
 	public byte[] getProfileImage(@PathVariable("username") String username, @PathVariable("fileName") String fileName) throws IOException {
-		return Files.readAllBytes(Paths.get(USER_FOLDER + FORWARD_SLASH + fileName));
+		return Files.readAllBytes(Paths.get(USER_FOLDER +username+ FORWARD_SLASH + fileName));
 	}
 	
-	@GetMapping(path = "/image/{profile}/{username}", produces = MediaType.IMAGE_JPEG_VALUE)
+	@GetMapping(path = "/image/profile/{username}", produces = MediaType.IMAGE_JPEG_VALUE)
 	public byte[] getTempProfileImage(@PathVariable("username") String username) throws IOException {
 		URL url = new URL(TEMP_PROFILE_IMAGE_BASE_URL+username);
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

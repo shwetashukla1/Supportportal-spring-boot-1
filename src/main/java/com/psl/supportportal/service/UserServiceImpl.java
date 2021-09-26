@@ -27,6 +27,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import static com.psl.supportportal.constant.FileConstant.*;
 
 import static com.psl.supportportal.constant.UserImplConstant.*;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import com.psl.supportportal.domain.User;
 import com.psl.supportportal.domain.UserPrincipal;
 import com.psl.supportportal.enumeration.Role;
@@ -51,8 +52,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	@Autowired
 	private LoginAttemptService loginAttemptService;
 	
-//	@Autowired
-//	private EmailService emailService;
+	@Autowired
+	private EmailService emailService;
 
 
 	@Override
@@ -109,7 +110,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		user.setProfileImageUrl(getTemporaryProfileImageUrl(userName));
 		userRepository.save(user);
 		logger.info("New user password : "+ password);
-		//emailService.sendPasswordEmail(firstName, password, email);
+		emailService.sendPasswordEmail(firstName, password, email);
 		return user;
 	}
 
@@ -205,7 +206,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 				logger.info(DIRECTORY_CREATED + userFolder);
 			}
 			Files.deleteIfExists(Paths.get(USER_FOLDER + user.getUsername() +DOT+ JPG_EXTENSION));
-			Files.copy(profileImage.getInputStream() , userFolder.resolve(user.getUsername() +DOT+JPG_EXTENSION));
+			Files.copy(profileImage.getInputStream() , userFolder.resolve(user.getUsername() +DOT+JPG_EXTENSION), REPLACE_EXISTING);
 			user.setProfileImageUrl(setProfileImageUrl(user.getUsername()));
 			userRepository.save(user);
 			logger.info(FILE_SAVED_IN_FILE_SYSTEM + profileImage.getOriginalFilename());
@@ -245,7 +246,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	}
 
 	@Override
-	public void resetPassword(String email) throws EmailNotFoundException {
+	public void resetPassword(String email) throws EmailNotFoundException, MessagingException {
 		User user = userRepository.findUserByEmail(email);
 		if(user == null) {
 			throw new EmailNotFoundException(NO_USER_FOUND_BY_EMAIL);
@@ -253,7 +254,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		String password = generatePassword();
 		user.setPassword(encodePassword(password));
 		userRepository.save(user);
-		//emailService.sendPasswordEmail(user.getFirstName(), password, email);
+		emailService.sendPasswordEmail(user.getFirstName(), password, email);
 	}
 
 	@Override

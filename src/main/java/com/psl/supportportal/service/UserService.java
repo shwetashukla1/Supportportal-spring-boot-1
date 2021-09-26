@@ -30,7 +30,7 @@ public interface UserService {
 	
 	void deleteUser(Long id);
 	
-	void resetPassword(String email) throws EmailNotFoundException;
+	void resetPassword(String email) throws EmailNotFoundException, MessagingException;
 	
 	User updateProfileImage(String username, MultipartFile profileImage) throws EmailAlreadyExistException, UsernameExistException, UserNotFoundException, IOException;
 }
