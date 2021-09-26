@@ -15,7 +15,7 @@ public class AuthenticationSuccessListener {
 	private LoginAttemptService loginAttemptService;
 	
 	@EventListener
-	public void OnAuthenticationSuccessListener(AuthenticationSuccessEvent event) {
+	public void onAuthenticationSuccessListener(AuthenticationSuccessEvent event) {
 		Object principal = event.getAuthentication().getPrincipal();
 		if(principal instanceof UserPrincipal) {
 			UserPrincipal user = (UserPrincipal) event.getAuthentication().getPrincipal();

@@ -16,7 +16,6 @@ public class LoginAttemptService {
 	private static final int ATTEMPT_INCREMENT = 1;
 	private LoadingCache<String, Integer> loggingAttemptCache;
 	
-	
 	public LoginAttemptService() {
 		loggingAttemptCache = CacheBuilder.newBuilder().expireAfterWrite(15, TimeUnit.MINUTES)
 				.maximumSize(100).build(new CacheLoader<String, Integer>() {
